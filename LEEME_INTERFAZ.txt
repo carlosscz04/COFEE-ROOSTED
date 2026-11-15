@@ -1,0 +1,7 @@
+=====================================================================
+ RESTAURANTE ORÍGENES SV · ERP + POS
+ Proyecto de Cátedra - Programación Web - Ciclo 02, 2026
+ Caso de negocio 1
+ Guía de la PARTE VISUAL (frontend) e instrucciones para ejecutarlo
+=====================================================================
+

@@ -1,24 +1,22 @@
-const IVA = 0.13;
 
-function desglosarIva(totalConIva) {
-  const total = Number(totalConIva);
+import { round2, requerir } from '../utils/http.js';
 
-  if (!Number.isFinite(total) || total < 0) {
-    throw new Error("El total debe ser un número válido y positivo");
-  }
+export const IVA = 0.13;
 
-  const subtotal = Number((total / (1 + IVA)).toFixed(2));
-  const iva = Number((total - subtotal).toFixed(2));
+// Desglosa el IVA incluido en el precio de venta.
+export function desglosarIva(total) {
+  const subtotal = round2(total / (1 + IVA));
 
   return {
     subtotal,
-    iva,
-    total: Number(total.toFixed(2))
+    iva: round2(total - subtotal),
+    total: round2(total)
   };
 }
 
-async function siguienteCorrelativo(client, tipo, sucursalId) {
-  const resultado = await client.query(
+// Obtiene el siguiente correlativo de forma atómica.
+export async function siguienteCorrelativo(client, tipo, sucursalId) {
+  const { rows } = await client.query(
     `UPDATE correlativos
      SET ultimo = ultimo + 1
      WHERE tipo = $1 AND sucursal_id = $2
@@ -26,18 +24,14 @@ async function siguienteCorrelativo(client, tipo, sucursalId) {
     [tipo, sucursalId]
   );
 
-  if (resultado.rowCount === 0) {
-    throw new Error("No existe un correlativo configurado para esta sucursal");
-  }
+  requerir(
+    rows[0],
+    'No hay correlativo configurado para esta sucursal',
+    500
+  );
 
   return {
-    serie: resultado.rows[0].serie,
-    correlativo: resultado.rows[0].ultimo
+    serie: rows[0].serie,
+    correlativo: rows[0].ultimo
   };
 }
-
-module.exports = {
-  IVA,
-  desglosarIva,
-  siguienteCorrelativo
-};

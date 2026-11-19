@@ -33,7 +33,7 @@ async function main() {
   const db = new pg.Client({ ...conn, database: dbName });
   await db.connect();
   try {
-    await db.query(fs.readFileSync(path.join(__dirname, '../../database/schema.sql'), 'utf8'));
+    await db.query(fs.readFileSync(path.join(__dirname, '../database/schema.sql'), 'utf8'));
     console.log('Esquema aplicado');
 
     const idsSucursal = [];

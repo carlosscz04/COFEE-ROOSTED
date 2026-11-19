@@ -16,7 +16,8 @@ import {
   Table
 } from 'reactstrap';
 import PageHeader from '../components/PageHeader';
-import { api, useApi } from '../hooks/useApi';
+import { useApi } from '../utils/useApi.js';
+import { api } from '../utils/api.js';
 
 export const meta = {
   path: '/sucursales',
@@ -59,8 +60,8 @@ export default function Sucursales() {
   return (
     <div>
       <PageHeader
-        title="Administración de Sucursales"
-        subtitle="Registro de puntos de venta, inicialización de correlativos fiscales e inventario base"
+        titulo="Administración de Sucursales"
+        subtitulo="Registro de puntos de venta, inicialización de correlativos fiscales e inventario base"
       />
 
       <Row className="g-4">

@@ -16,7 +16,8 @@ import {
   Table
 } from 'reactstrap';
 import PageHeader from '../components/PageHeader';
-import { api, useApi } from '../hooks/useApi';
+import { useApi } from '../utils/useApi.js';
+import { api } from '../utils/api.js';
 
 export const meta = {
   path: '/usuarios',
@@ -80,8 +81,8 @@ export default function Usuarios() {
   return (
     <div>
       <PageHeader
-        title="Administración de Usuarios"
-        subtitle="Gestión de cuentas de acceso, roles y asignación por sucursal"
+        titulo="Administración de Usuarios"
+        subtitulo="Gestión de cuentas de acceso, roles y asignación por sucursal"
       />
 
       <Row className="g-4">

@@ -1,11 +1,11 @@
 import { Router } from 'express';
-import { query, withTx } from '../config/db.js';
+import { query, withTx } from '../db.js';
 import { requireAuth, requireRole } from '../middleware/auth.js';
 
 const router = Router();
 
 // GET /api/sucursales (existente)
-router.get('/sucursales', requireAuth, async (_req, res, next) => {
+router.get('/', requireAuth, async (_req, res, next) => {
   try {
     const { rows } = await query('SELECT * FROM sucursales ORDER BY id ASC');
     res.json(rows);
@@ -15,7 +15,7 @@ router.get('/sucursales', requireAuth, async (_req, res, next) => {
 });
 
 // POST /api/sucursales - Crear sucursal con correlativos e inventario inicial en una transacción
-router.post('/sucursales', requireAuth, requireRole('admin'), async (req, res, next) => {
+router.post('/', requireAuth, requireRole('admin'), async (req, res, next) => {
   try {
     const { nombre, direccion } = req.body;
 
@@ -48,7 +48,7 @@ router.post('/sucursales', requireAuth, requireRole('admin'), async (req, res, n
 
       // 2. Insertar correlativos FCF y CCF (ej. FCF03, CCF03) con ultimo = 0
       await client.query(
-        `INSERT INTO correlativos (sucursal_id, tipo_documento, serie, ultimo)
+        `INSERT INTO correlativos (sucursal_id, tipo, serie, ultimo)
          VALUES 
            ($1, 'FCF', $2, 0),
            ($1, 'CCF', $3, 0)`,

@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import bcrypt from 'bcryptjs';
-import { query } from '../config/db.js';
+import { query } from '../db.js';
 import { requireAuth, requireRole } from '../middleware/auth.js';
 
 const router = Router();
@@ -8,13 +8,13 @@ const ROLES_VALIDOS = ['admin', 'gerente', 'cajero'];
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 // GET /api/usuarios - Listar todas las cuentas de acceso (solo admin)
-router.get('/usuarios', requireAuth, requireRole('admin'), async (_req, res, next) => {
+router.get('/', requireAuth, requireRole('admin'), async (_req, res, next) => {
   try {
     const { rows } = await query(`
       SELECT 
         u.id,
         u.nombre,
-        u.correo,
+        u.email AS correo,
         u.rol,
         u.activo,
         u.sucursal_id,
@@ -30,7 +30,7 @@ router.get('/usuarios', requireAuth, requireRole('admin'), async (_req, res, nex
 });
 
 // POST /api/usuarios - Crear cuenta de usuario (solo admin)
-router.post('/usuarios', requireAuth, requireRole('admin'), async (req, res, next) => {
+router.post('/', requireAuth, requireRole('admin'), async (req, res, next) => {
   try {
     const { nombre, correo, contraseña, password, rol, sucursal_id } = req.body;
     const clavePlana = contraseña || password;
@@ -68,7 +68,7 @@ router.post('/usuarios', requireAuth, requireRole('admin'), async (req, res, nex
     }
 
     // 3. Verificar unicidad de correo (409 Conflict)
-    const existeRes = await query('SELECT id FROM usuarios WHERE LOWER(correo) = $1', [correoLimpio]);
+    const existeRes = await query('SELECT id FROM usuarios WHERE LOWER(email) = $1', [correoLimpio]);
     if (existeRes.rows.length > 0) {
       return res.status(409).json({ error: 'Ese correo ya está registrado' });
     }
@@ -76,9 +76,9 @@ router.post('/usuarios', requireAuth, requireRole('admin'), async (req, res, nex
     // 4. Hashear contraseña e insertar
     const passwordHash = bcrypt.hashSync(String(clavePlana), 10);
     const insertRes = await query(
-      `INSERT INTO usuarios (nombre, correo, password_hash, rol, sucursal_id, activo)
+      `INSERT INTO usuarios (nombre, email, password_hash, rol, sucursal_id, activo)
        VALUES ($1, $2, $3, $4, $5, TRUE)
-       RETURNING id, nombre, correo, rol, sucursal_id`,
+       RETURNING id, nombre, email AS correo, rol, sucursal_id`,
       [nombre.trim(), correoLimpio, passwordHash, rol, sucursalIdNum]
     );
 
